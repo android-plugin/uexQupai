@@ -1,0 +1,77 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        targetSdkVersion 14
+        versionCode 1
+        versionName "1.0"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+            jniLibs.srcDirs=['libs']
+        }
+
+        // Move the tests to tests/java, tests/res, etc...
+        instrumentTest.setRoot('tests')
+
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile(name: 'Engine-release-3.3.0', ext: 'aar')
+    compile(name: 'Minisdk-release', ext: 'aar')
+
+//    apt "com.google.dagger:dagger-compiler:2.0.1"
+//    apt 'com.google.auto.factory:auto-factory:1.0-beta2'
+//    compile "com.fasterxml.jackson.core:jackson-databind:2.4.4"
+//    compile "com.google.dagger:dagger:2.0.1"
+//    compile "com.google.code.findbugs:jsr305:3.0.0"
+//    compile "com.google.guava:guava:18.0"
+}
+
+
+def pluginName="uexQupai"
+def buildConfigPath="org/zywx/wbpalmstar/widgetone/"
+
+def jarDir=pluginName+'/jar/'
+def jarName="plugin_"+pluginName+".jar"
+def jarPath=jarDir+jarName
+
+task clearJar(type: Delete) {
+    delete jarPath;
+}
+
+task makeJar(type:Jar,dependsOn:['compileReleaseJavaWithJavac']) {
+    archiveName jarName
+    from('build/intermediates/classes/release/')
+    destinationDir=file(jarDir)
+    exclude('**/R.class')
+    exclude('**/R\$*.class')
+    exclude('**/BuildConfig.class')
+    exclude(buildConfigPath)
+}
+makeJar.dependsOn(clearJar)

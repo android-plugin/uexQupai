@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<uexplugins>
+    <plugin
+        className="org.zywx.wbpalmstar.plugin.uexqupai.EUExQupai" uexName="uexQupai" >
+        <method name = "init" />
+        <method name = "config" />
+        <method name = "record"/>
+    </plugin>
+</uexplugins>
