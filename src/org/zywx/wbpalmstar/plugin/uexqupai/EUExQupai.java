@@ -141,7 +141,6 @@ public class EUExQupai extends EUExBase {
                 //得到视频path，和缩略图path的数组，返回十张缩略图,和视频时长
                 JSONObject jsonObject = new JSONObject();
                 try {
-                    jsonObject.put("status", 0);
                     jsonObject.put("videoPath", result.getPath());
                     jsonObject.put("thumbnail", result.getThumbnail()[0]);
                     callBackPluginJs(CALLBACK_RECORD, jsonObject.toString());
