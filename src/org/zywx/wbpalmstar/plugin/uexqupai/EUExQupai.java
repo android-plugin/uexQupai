@@ -142,7 +142,7 @@ public class EUExQupai extends EUExBase {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("videoPath", result.getPath());
-                    jsonObject.put("thumbnail", result.getThumbnail()[0]);
+                    jsonObject.put("thumbnail", result.getPath() + ".png");
                     callBackPluginJs(CALLBACK_RECORD, jsonObject.toString());
                 } catch (JSONException e) {
                     Log.i(TAG, e.getMessage());
