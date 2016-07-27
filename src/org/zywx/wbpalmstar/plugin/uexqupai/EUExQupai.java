@@ -29,6 +29,8 @@ public class EUExQupai extends EUExBase {
     private static int QUPAI_RECORD_REQUEST = 1;
     private static String CALLBACK_INIT= "uexQupai.cbInit";
     private static String CALLBACK_RECORD = "uexQupai.cbRecord";
+    private String initCallbackId;
+    private String recordCallbackId;
 
     private Context context;
 
@@ -42,6 +44,9 @@ public class EUExQupai extends EUExBase {
         if (params == null &&  params.length < 1) {
             errorCallback(0, 0, "error params!");
             return;
+        }
+        if (params.length == 2) {
+            initCallbackId = params[1];
         }
         JSONObject jsonObject;
         try {
@@ -115,12 +120,15 @@ public class EUExQupai extends EUExBase {
     }
 
     public void record(String params[]) {
+        if (params != null && params.length > 0) {
+            recordCallbackId = params[0];
+        }
         JSONObject jsonObject = new JSONObject();
         if (builder == null) {
             try {
                 jsonObject.put("status", 1);
                 jsonObject.put("error", "please call config method first");
-                callBackPluginJs(CALLBACK_RECORD, jsonObject.toString());
+                callback(CALLBACK_RECORD, jsonObject);
                 return;
             } catch (JSONException e) {
                 Log.i(TAG, e.getMessage());
@@ -143,7 +151,7 @@ public class EUExQupai extends EUExBase {
                 try {
                     jsonObject.put("videoPath", result.getPath());
                     jsonObject.put("thumbnail", result.getPath() + ".png");
-                    callBackPluginJs(CALLBACK_RECORD, jsonObject.toString());
+                    callback(CALLBACK_RECORD, jsonObject);
                 } catch (JSONException e) {
                     Log.i(TAG, e.getMessage());
                 }
@@ -154,6 +162,23 @@ public class EUExQupai extends EUExBase {
         }
     }
 
+    private void callback(String methodName, JSONObject result) {
+        if(CALLBACK_INIT.equals(methodName)) {
+            if (!TextUtils.isEmpty(initCallbackId)) {
+                callbackToJs(Integer.parseInt(initCallbackId), false, result);
+            } else {
+                callBackPluginJs(methodName, result.toString());
+            }
+            return;
+        }
+        if (CALLBACK_RECORD.equals(methodName)) {
+            if(!TextUtils.isEmpty(recordCallbackId)) {
+                callbackToJs(Integer.parseInt(recordCallbackId), false, result);
+            } else {
+                callBackPluginJs(methodName, result.toString());
+            }
+        }
+    }
     private void callBackPluginJs(String methodName, String jsonData){
         String js = SCRIPT_HEADER + "if(" + methodName + "){"
                 + methodName + "('" + jsonData + "');}";
@@ -169,7 +194,7 @@ public class EUExQupai extends EUExBase {
                 try {
                     jsonObject.put("status", 1);
                     jsonObject.put("code", errorCode);
-                    callBackPluginJs(CALLBACK_INIT, jsonObject.toString());
+                    callback(CALLBACK_INIT, jsonObject);
                 } catch (JSONException e) {
                     Log.i(TAG, e.getMessage());
                 }
@@ -181,7 +206,7 @@ public class EUExQupai extends EUExBase {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("status", 0);
-                    callBackPluginJs(CALLBACK_INIT, jsonObject.toString());
+                    callback(CALLBACK_INIT, jsonObject);
                 } catch (JSONException e) {
                     Log.i(TAG, e.getMessage());
                 }

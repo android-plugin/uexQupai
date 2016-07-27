@@ -38,19 +38,15 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    maven {
+        url 'https://raw.githubusercontent.com/android-plugin/mvn-repo/master/'
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile(name: 'Engine-release-3.3.0', ext: 'aar')
+    compile ('org.appcan:engine:+:systemRelease@aar')
     compile(name: 'Minisdk-release', ext: 'aar')
-
-//    apt "com.google.dagger:dagger-compiler:2.0.1"
-//    apt 'com.google.auto.factory:auto-factory:1.0-beta2'
-//    compile "com.fasterxml.jackson.core:jackson-databind:2.4.4"
-//    compile "com.google.dagger:dagger:2.0.1"
-//    compile "com.google.code.findbugs:jsr305:3.0.0"
-//    compile "com.google.guava:guava:18.0"
 }
 
 

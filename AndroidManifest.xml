@@ -6,7 +6,7 @@
     android:versionName="3.0"
     tools:overrideLibrary="org.zywx.wbpalmstar.widgetone.uex"
     >
-
+    <uses-sdk android:minSdkVersion="16"/>
     <application>
         <activity
             android:name="org.zywx.wbpalmstar.engine.LoadingActivity"
