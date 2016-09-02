@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.zywx.wbpalmstar.engine.EBrowserView;
 import org.zywx.wbpalmstar.engine.universalex.EUExBase;
+import org.zywx.wbpalmstar.engine.universalex.EUExCallback;
 
 public class EUExQupai extends EUExBase {
     private static final String TAG = "EUExQupai";
@@ -128,7 +129,7 @@ public class EUExQupai extends EUExBase {
             try {
                 jsonObject.put("status", 1);
                 jsonObject.put("error", "please call config method first");
-                callback(CALLBACK_RECORD, jsonObject);
+                callback(CALLBACK_RECORD, false, jsonObject);
                 return;
             } catch (JSONException e) {
                 Log.i(TAG, e.getMessage());
@@ -151,21 +152,27 @@ public class EUExQupai extends EUExBase {
                 try {
                     jsonObject.put("videoPath", result.getPath());
                     jsonObject.put("thumbnail", result.getPath() + ".png");
-                    callback(CALLBACK_RECORD, jsonObject);
+                    callback(CALLBACK_RECORD, true, jsonObject);
                 } catch (JSONException e) {
                     Log.i(TAG, e.getMessage());
                 }
                 //删除草稿
                 QupaiDraftManager draftManager = new QupaiDraftManager();
                 draftManager.deleteDraft(data);
+            } else {
+                callback(CALLBACK_RECORD, false, null);
             }
         }
     }
 
-    private void callback(String methodName, JSONObject result) {
+    private void callback(String methodName, boolean isSuccess, JSONObject result) {
         if(CALLBACK_INIT.equals(methodName)) {
             if (!TextUtils.isEmpty(initCallbackId)) {
-                callbackToJs(Integer.parseInt(initCallbackId), false, result);
+                if (isSuccess) {
+                    callbackToJs(Integer.parseInt(initCallbackId), false, EUExCallback.F_C_SUCCESS, result);
+                } else {
+                    callbackToJs(Integer.parseInt(initCallbackId), false, EUExCallback.F_C_FAILED, result.optString("error"));
+                }
             } else {
                 callBackPluginJs(methodName, result.toString());
             }
@@ -173,7 +180,11 @@ public class EUExQupai extends EUExBase {
         }
         if (CALLBACK_RECORD.equals(methodName)) {
             if(!TextUtils.isEmpty(recordCallbackId)) {
-                callbackToJs(Integer.parseInt(recordCallbackId), false, result);
+                if (isSuccess) {
+                    callbackToJs(Integer.parseInt(recordCallbackId), false, EUExCallback.F_C_SUCCESS, result);
+                } else {
+                    callbackToJs(Integer.parseInt(recordCallbackId), false, EUExCallback.F_C_FAILED, result);
+                }
             } else {
                 callBackPluginJs(methodName, result.toString());
             }
@@ -193,8 +204,8 @@ public class EUExQupai extends EUExBase {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("status", 1);
-                    jsonObject.put("code", errorCode);
-                    callback(CALLBACK_INIT, jsonObject);
+                    jsonObject.put("error", errorCode);
+                    callback(CALLBACK_INIT, false, jsonObject);
                 } catch (JSONException e) {
                     Log.i(TAG, e.getMessage());
                 }
@@ -206,7 +217,7 @@ public class EUExQupai extends EUExBase {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("status", 0);
-                    callback(CALLBACK_INIT, jsonObject);
+                    callback(CALLBACK_INIT, true, jsonObject);
                 } catch (JSONException e) {
                     Log.i(TAG, e.getMessage());
                 }
